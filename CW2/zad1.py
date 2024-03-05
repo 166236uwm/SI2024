@@ -1,10 +1,12 @@
 from collections import deque
 
+
 def is_goal_state(state):
     return state['A'] == 'clean' and state['B'] == 'clean'
 
+
 def breadth_first_search():
-    initial_state = {'agent_location': 'A', 'A': 'dirty', 'B': 'dirty'}
+    initial_state = {'agent_location': 'A', 'A': 'clean', 'B': 'dirty'}
     queue = deque([(initial_state, [])])
 
     while queue:
@@ -27,6 +29,7 @@ def breadth_first_search():
         suck_actions = actions + ['suck']
         queue.append((suck_result, suck_actions))
 
+
 def apply_action(state, action):
     new_state = state.copy()
 
@@ -38,5 +41,6 @@ def apply_action(state, action):
         new_state[new_state['agent_location']] = 'clean'
 
     return new_state
+
 
 breadth_first_search()
