@@ -70,7 +70,7 @@ def apply_action(state, row, col, action):
 initial_state = (
     (' ', '1', '3'),
     ('4', '2', '5'),
-    ('7', '6', '8')
+    ('7', '8', '6')
 )
 
 goal_state = (
