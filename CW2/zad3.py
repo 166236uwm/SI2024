@@ -1,12 +1,66 @@
-def minimax_alpha_beta(board, depth, alpha, beta, maximizing_player):
-    if depth == 0 or is_terminal(board):
-        return evaluate(board)
+class TicTacToe:
+    def __init__(self, board=None, player='X'):
+        self.player = player  # 'X' or 'O'
+        if board is None:
+            self.board = [[' ' for _ in range(3)] for _ in range(3)]
+        else:
+            self.board = board
+
+    def is_terminal(self):
+        # Sprawdzenie, czy jest zwycięzca
+        for i in range(3):
+            if self.board[i][0] == self.board[i][1] == self.board[i][2] != ' ':
+                return True
+            if self.board[0][i] == self.board[1][i] == self.board[2][i] != ' ':
+                return True
+
+        if self.board[0][0] == self.board[1][1] == self.board[2][2] != ' ':
+            return True
+        if self.board[0][2] == self.board[1][1] == self.board[2][0] != ' ':
+            return True
+
+        # Sprawdzenie, czy plansza jest pełna
+        for row in self.board:
+            if ' ' in row:
+                return False
+
+        return True
+
+    def utility(self):
+        # Sprawdzenie, kim jest zwycięzca
+        for i in range(3):
+            if self.board[i][0] == self.board[i][1] == self.board[i][2] != ' ':
+                return 1 if self.board[i][0] == 'X' else -1
+            if self.board[0][i] == self.board[1][i] == self.board[2][i] != ' ':
+                return 1 if self.board[0][i] == 'X' else -1
+
+        if self.board[0][0] == self.board[1][1] == self.board[2][2] != ' ':
+            return 1 if self.board[0][0] == 'X' else -1
+        if self.board[0][2] == self.board[1][1] == self.board[2][0] != ' ':
+            return 1 if self.board[0][2] == 'X' else -1
+
+        return 0  # Remis
+
+    def children(self):
+        children = []
+        next_player = 'O' if self.player == 'X' else 'X'
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] == ' ':
+                    new_board = [row.copy() for row in self.board]
+                    new_board[i][j] = self.player
+                    children.append(TicTacToe(new_board, next_player))
+        return children
+
+
+def alpha_beta_pruning(node, depth, alpha, beta, maximizing_player=True):
+    if depth == 0 or node.is_terminal():
+        return node.utility()
 
     if maximizing_player:
         max_eval = float('-inf')
-        for move in get_available_moves(board):
-            new_board = make_move(board, move, 'X')
-            eval = minimax_alpha_beta(new_board, depth - 1, alpha, beta, False)
+        for child in node.children():
+            eval = alpha_beta_pruning(child, depth - 1, alpha, beta, False)
             max_eval = max(max_eval, eval)
             alpha = max(alpha, eval)
             if beta <= alpha:
@@ -14,9 +68,8 @@ def minimax_alpha_beta(board, depth, alpha, beta, maximizing_player):
         return max_eval
     else:
         min_eval = float('inf')
-        for move in get_available_moves(board):
-            new_board = make_move(board, move, 'O')
-            eval = minimax_alpha_beta(new_board, depth - 1, alpha, beta, True)
+        for child in node.children():
+            eval = alpha_beta_pruning(child, depth - 1, alpha, beta, True)
             min_eval = min(min_eval, eval)
             beta = min(beta, eval)
             if beta <= alpha:
@@ -24,53 +77,8 @@ def minimax_alpha_beta(board, depth, alpha, beta, maximizing_player):
         return min_eval
 
 
-def find_best_move(board):
-    best_val = float('-inf')
-    best_move = None
-
-    for move in get_available_moves(board):
-        new_board = make_move(board, move, 'X')
-        move_val = minimax_alpha_beta(new_board, 3, float('-inf'), float('inf'), False)
-
-        if move_val > best_val:
-            best_val = move_val
-            best_move = move
-
-    return best_move
-
-
-def is_terminal(board):
-    pass
-
-
-def evaluate(board):
-    pass
-
-
-def get_available_moves(board):
-    moves = []
-    for i in range(3):
-        for j in range(3):
-            if board[i][j] == ' ':
-                moves.append((i, j))
-    return moves
-
-
-def make_move(board, move, player):
-    # Wykonuje ruch na planszy
-    i, j = move
-    new_board = [row.copy() for row in board]
-    new_board[i][j] = player
-    return new_board
-
-
-# Przykładowa plansza
-sample_board = [
-    ['X', 'O', 'X'],
-    ['O', ' ', ' '],
-    [' ', 'X', 'X']
-]
-
-best_move = find_best_move(sample_board)
-
-print("Optymalny ruch:", best_move)
+# Testujemy algorytm na pustej planszy
+initial_board = TicTacToe()
+best_outcome = alpha_beta_pruning(initial_board, depth=9, alpha=float('-inf'), beta=float('inf'),
+                                  maximizing_player=True)
+print(best_outcome)
