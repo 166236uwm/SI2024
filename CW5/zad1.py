@@ -18,7 +18,6 @@ def pl_true(S, m):
         raise ValueError("Unsupported logical connective")
 
 
-# Example usage:
 S = ('p', '∧', ('¬', 'q'))  # p ∧ ¬q
 m = {'p': True, 'q': False}
 
