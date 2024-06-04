@@ -9,7 +9,7 @@ def sigmoid_derivative(x):
     return x * (1 - x)
 
 # Input values
-x = np.array([0.6, 0.1])
+x = np.array([0.6, 0.1, 0.0])
 target = 1
 
 # Initial weights
@@ -33,11 +33,11 @@ error = target - o_output
 
 # Backward propagation
 delta_o = error * sigmoid_derivative(o_output)
-delta_h = delta_o * w_ho * sigmoid_derivative(h_output)
+delta_h = np.dot(w_ho, delta_o) * sigmoid_derivative(h_output)  # Adjusted to match the shape of w_ih
 
 # Update weights
-w_ho += alpha * delta_o * h_output
-w_ih += alpha * np.outer(x, delta_h).T
+w_ho += alpha * np.outer(delta_o, h_output).flatten()  # Adjusted to match the shape of w_ho
+w_ih += alpha * np.outer(x, delta_h)  # Adjusted to match the shape of w_ih
 
 # Update biases
 bias_o += alpha * delta_o
